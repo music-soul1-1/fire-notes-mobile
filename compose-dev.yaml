@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  app:
+    image: docker/dev-environments-javascript:stable-1
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    command: >
+      sh -c "cd /app && npm install && npm run dev"
