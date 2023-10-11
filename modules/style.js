@@ -85,9 +85,46 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     backgroundColor: consts.ternary,
   },
+  noteContentTextInput: {
+    width: '100%',
+    textAlignVertical: 'top',
+    backgroundColor: consts.backgroundTernaryDark,
+    minHeight: 600,
+  },
   textStandartBlue: {
     color: consts.textActiveLight,
-  }
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    marginVertical: 4,
+    marginHorizontal: 8,
+    alignItems: 'center',
+  },
+  tagTextInput: {
+    backgroundColor: consts.ternary,
+    paddingHorizontal: 15,
+    height: 40,
+    justifyContent:"center",
+    borderRadius: 13,
+    color: consts.textActiveLight,
+    borderColor: consts.secondary,
+    borderWidth: 1,
+  },
+  subtaskContainer: {
+    width: '100%', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    backgroundColor: consts.ternary,
+    borderRadius: 18,
+    padding: 0,
+    margin: 10,
+  },
+  dialog: {
+    backgroundColor: consts.ternary,
+    padding: 10,
+    color: consts.textActiveLight,
+  },
 });
 
 export default styles;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, TextInput } from "react-native";
 import * as consts from '../modules/consts'
-import { Button, IconButton, TextInput } from "react-native-paper";
-import { updateNote, deleteDocument, updateNoteDate } from "../modules/FirebaseHandler";
+import { Button, IconButton, TextInput as PaperTextInput, Dialog, Portal, Text } from "react-native-paper";
+import { updateNote, deleteDocument, updateNoteDate, convertTimestampToString } from "../modules/FirebaseHandler";
 import styles from "../modules/style";
 import { Note } from "../modules/types";
 import { useNavigation } from "@react-navigation/native";
@@ -12,6 +12,7 @@ export default function NoteEditScreen({ note }: { note: Note }) {
   const [title, setTitle] = useState<string>(note.title);
   const [content, setContent] = useState<string>(note.content);
   const [tags, setTags] = useState<string[]>(note.tags);
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
   const navigation = useNavigation<any>();
 
   useEffect(() => {
@@ -31,11 +32,11 @@ export default function NoteEditScreen({ note }: { note: Note }) {
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={styles.editScreenContainer}>
-        <TextInput 
+        <PaperTextInput 
           value={title} 
           onChangeText={async text => {setTitle(text); await updateNoteDate(note.id);}} 
           multiline={true} 
-          style={styles.titleTextInput}
+          style={[styles.titleTextInput, {marginTop: 10, backgroundColor: consts.backgroundTernaryDark}]}
           underlineColor={consts.ternaryActive}
           activeUnderlineColor={consts.primary}
           textColor={consts.textActiveLight}
@@ -43,11 +44,11 @@ export default function NoteEditScreen({ note }: { note: Note }) {
           placeholder="Title"
           placeholderTextColor={'#777'}
         />
-        <TextInput 
+        <PaperTextInput 
           value={content}
           onChangeText={async text => {setContent(text); await updateNoteDate(note.id);}}
           multiline={true}
-          style={[styles.contentTextInput, {minHeight: 600}]}
+          style={styles.noteContentTextInput}
           underlineColor={consts.ternaryActive}
           activeUnderlineColor={consts.primary}
           textColor={consts.textActiveLight}
@@ -66,23 +67,19 @@ export default function NoteEditScreen({ note }: { note: Note }) {
           >
           Add tag
         </Button>
-        <View>
+        <View style={{flexDirection: 'row', flex: 1, flexWrap: 'wrap', justifyContent: 'center'}}>
           {Array.isArray(tags) && tags.map((tag, index) => (
-            <View key={index} style={{flexDirection: 'row', marginVertical: 4}}>
+            <View key={index} style={styles.tagsContainer}>
               <TextInput 
                 key={index} 
-                value={tag} 
-                mode="outlined"
+                value={tag}
                 placeholder="Enter tag"
                 onChangeText={text => {
                   const updatedTags = [...tags];
                   updatedTags[index] = text;
                   setTags(updatedTags);
                 }}
-                style={{backgroundColor: consts.ternary}}
-                textColor={consts.textActiveLight}
-                outlineColor={consts.ternaryActive}
-                activeOutlineColor={consts.secondary}
+                style={styles.tagTextInput}
                 placeholderTextColor={'#777'}
               />
               <IconButton 
@@ -98,7 +95,35 @@ export default function NoteEditScreen({ note }: { note: Note }) {
           ))}
         </View>
 
-        <Button onPress={handleDeleteNote} textColor={consts.secondary}>Delete Note</Button>
+        <Button 
+          onPress={() => setDialogVisible(true)}
+          textColor={consts.secondary}
+          style={{margin: 10}}>
+            Delete note
+        </Button>
+        <Portal>
+          <Dialog style={styles.dialog} visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+            <Dialog.Title>Delete note</Dialog.Title>
+            <Dialog.Content>
+              <Text>Are you sure you want to delete this note?</Text>
+            </Dialog.Content>
+            <Dialog.Actions style={{justifyContent: 'space-between'}}>
+              <Button textColor={consts.textActiveLight} style={{paddingHorizontal: 10}} onPress={() => setDialogVisible(false)}>No</Button>
+              <Button textColor={consts.textActiveLight} onPress={() => {setDialogVisible(false); handleDeleteNote()}}>Yes</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <Text
+            style={[styles.textStandart, {color: consts.textActiveLight, margin: 10}]}>
+              Last updated: {convertTimestampToString(note.updatedAt)}
+          </Text>
+          <Text
+            style={[styles.textStandart, {color: consts.textActiveLight, margin: 10}]}>
+              Created: {convertTimestampToString(note.createdAt)}
+          </Text>
+        </View>
       </View>
     </ScrollView>
   );

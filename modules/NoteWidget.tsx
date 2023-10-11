@@ -19,7 +19,7 @@ export default function NoteWidget({ note, setNote }: { note: Note, setNote: any
     <TouchableRipple key={note.id} onPress={handleNotePress} style={styles.noteWidgetContainer}>
       <View>
         <Text style={styles.textMedium}>{note.title}</Text>
-        <Text style={styles.textStandart}>{note.content}</Text>
+        <Text style={styles.textStandart} numberOfLines={9}>{note.content}</Text>
       </View>
     </TouchableRipple>
   );

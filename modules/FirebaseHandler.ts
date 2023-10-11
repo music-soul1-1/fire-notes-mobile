@@ -2,6 +2,7 @@ import EncryptedStorage from "react-native-encrypted-storage";
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Note, Todo } from "./types";
+import { firebase } from "@react-native-firebase/auth";
 
 
 let uid : string | null;
@@ -10,7 +11,8 @@ let uid : string | null;
  * Updates uid value for API handler.
  */
 export async function loadUid() {
-  uid = await EncryptedStorage.getItem("uid");
+  uid = await EncryptedStorage.getItem("uid") ?? firebase.auth().currentUser?.uid ?? null;
+
   if (uid) {
     return true;
   }
@@ -56,7 +58,10 @@ export async function addNote(title: string, content: string) {
  * @returns array of notes
  */
 export async function getAllNotes() {
-  const uid = await EncryptedStorage.getItem("uid") ?? ' ';
+  if (!uid) {
+    uid = '';
+    await loadUid();
+  }
 
   const notesRef = firestore()
     .collection("users")
@@ -64,7 +69,7 @@ export async function getAllNotes() {
     .collection("notes");
 
   const notesQuery = notesRef.orderBy("updatedAt", "desc");
-  const querySnapshot = await notesQuery.get();
+  const querySnapshot = await notesQuery.get({ source: 'server' });
 
   const notes = querySnapshot.docs.map((doc) => {
     const data = doc.data();

@@ -40,12 +40,19 @@ This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-no
 1. Clone the repository.
 2. Install dependencies with `npm install`.
 3. Download google-services.json from your Firebase project and put it in the android/app folder.
-4. Run the app with `npm start` in one terminal, and ` npx react-native run-android` in the other.
-5. After making changes, open pull request.
+4. Run the app with `npm start` in one terminal, and `npx react-native run-android` in the other.
+5. After making changes and testing, open pull request.
+
+To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
 
 ## Changelog
+### v.0.0.2
+- Styling improvements
+- FAB added
+- App icon added
+
 ### v.0.0.1
-  - Initial release
+- Initial release
 
 ## License
 FireNotes is an open-source project and released under the [MIT License](https://github.com/music-soul1-1/fire-notes-mobile/blob/main/LICENSE.txt).

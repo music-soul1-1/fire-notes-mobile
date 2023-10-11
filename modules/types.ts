@@ -22,7 +22,7 @@ export type Todo = {
   tags: string[];
   createdAt: FirebaseFirestoreTypes.Timestamp;
   updatedAt: FirebaseFirestoreTypes.Timestamp;
-  isPinned: boolean; // TODO: rename this to isPinned in web version
+  isPinned: boolean;
   subtask: {
     text: string;
     completed: boolean;

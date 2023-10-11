@@ -1,7 +1,7 @@
 import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
-import { Button, ActivityIndicator } from "react-native-paper";
+import { View, ScrollView, RefreshControl } from "react-native";
+import { ActivityIndicator, FAB, Portal } from "react-native-paper";
 import { 
   addNote, addTodo, getAllNotes, getAllTodos, 
   subscribeToNotesChanges, subscribeToTodosChanges, 
@@ -11,23 +11,38 @@ import styles from "../modules/style";
 import NoteWidget from "../modules/NoteWidget";
 import TodoWidget from "../modules/TodoWidget";
 import { Note, Todo } from "../modules/types";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation ,useFocusEffect } from "@react-navigation/native";
 import { theme } from "../modules/theme";
+import * as consts from '../modules/consts';
 
 
 export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseAuthTypes.UserCredential, setNote: any, setTodo: any }) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isFabOpen, setIsFabOpen] = useState<boolean>(false);
+  const [isFabVisible, setIsFabVisible] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const navigation = useNavigation<any>();
 
   async function fetchData() {
     const fetchedNotes = await getAllNotes();
+    setTimeout(() => {}, 50);
     const fetchedTodos = await getAllTodos();
     setNotes(fetchedNotes);
     setTodos(fetchedTodos);
+    setTimeout(() => {}, 50);
   };
-  
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsFabVisible(true); // Show the FAB when the screen is focused
+
+      return () => {
+        setIsFabVisible(false); // Hide the FAB when the screen loses focus
+      };
+    }, [])
+  );
 
   useEffect(() => {
     fetchData();
@@ -50,6 +65,7 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
   
   async function handleAddNote() {
     setLoading(true);
+    setIsFabVisible(false);
     const noteId = await addNote('', '');
     const note = await getNoteById(noteId ?? '');
     if (note) {
@@ -64,6 +80,7 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
 
   async function handleAddTodo() {
     setLoading(true);
+    setIsFabVisible(false);
     const todoId = await addTodo('', '');
     const todo = await getTodoById(todoId ?? '');
     if (todo) {
@@ -76,6 +93,12 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
     setLoading(false);
   };
 
+  function onRefresh() {
+    setRefreshing(true);
+    fetchData();
+    setRefreshing(false);
+  };
+
   if (loading) return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} >
       <ActivityIndicator size={60} color={theme.coreColors.tertiary} />
@@ -83,23 +106,17 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
   );
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView
+    contentContainerStyle={{flexGrow: 1}}
+    refreshControl={
+      <RefreshControl 
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        colors={[consts.ternary, consts.backgroundTernaryDark]}
+        tintColor={consts.ternary}
+        progressBackgroundColor={consts.textActiveLight}/>
+    }>
       <View style={styles.screenContainer}>
-        <Text style={styles.textMedium}>Welcome, {user.user.displayName ?? "User"}</Text>
-        <View style={{flexDirection: 'row', margin: 10, gap: 15}}>
-          <Button
-            mode="contained-tonal"
-            onPress={async () => {await handleAddNote()}}
-          >
-            Add note
-          </Button>
-          <Button 
-            mode="contained-tonal"
-            onPress={async () => {await handleAddTodo()}}
-          >
-            Add todo
-          </Button>
-        </View>
         
         {combinedArray.map((item) => {
           if ('content' in item) {
@@ -109,10 +126,29 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
           }
           else {
             return (
-            <TodoWidget key={item.id} todo={item} setTodo={setTodo} />
+              <TodoWidget key={item.id} todo={item} setTodo={setTodo} />
             )
           }
         })}
+        <Portal>
+          <FAB.Group
+            open={isFabOpen}
+            color={consts.ternary}
+            fabStyle={{backgroundColor: consts.textActiveLight}}
+            visible={isFabVisible}
+            icon={'plus'}
+            actions={[
+              {icon: 'note', label: 'Add note', 
+                onPress: async () => {await handleAddNote()}, 
+                style: {backgroundColor: consts.ternary}, color: consts.textActiveLight},
+
+              {icon: 'playlist-check', label: 'Add todo', 
+                onPress: async () => {await handleAddTodo()}, 
+                style: {backgroundColor: consts.ternary}, color: consts.textActiveLight},
+            ]}
+            onStateChange={() => setIsFabOpen(!isFabOpen)}
+          />
+        </Portal>
       </View>
     </ScrollView>
   );

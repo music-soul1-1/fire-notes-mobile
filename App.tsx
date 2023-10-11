@@ -102,7 +102,7 @@ function App(): JSX.Element {
               headerTintColor: '#fff',
               drawerStyle: {
                 backgroundColor: consts.ternary,
-                width: 200,
+                width: 220,
               },
               drawerActiveTintColor: consts.secondary,
             }}>
@@ -127,10 +127,10 @@ function App(): JSX.Element {
                   >
                     {() => <HomeScreen user={user} setNote={setNoteData} setTodo={setTodoData} />}
                   </Stack.Screen>
-                  <Stack.Screen name='NoteEditScreen'>
+                  <Stack.Screen name='NoteEditScreen' options={{headerTitle: ''}}>
                     {() => <NoteEditScreen note={note} />}
                   </Stack.Screen>
-                  <Stack.Screen name='TodoEditScreen'>
+                  <Stack.Screen name='TodoEditScreen' options={{headerTitle: ''}}>
                     {() => <TodoEditScreen initialTodo={todo} />}
                   </Stack.Screen>
                 </Stack.Navigator>
