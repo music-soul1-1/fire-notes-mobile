@@ -5,7 +5,7 @@
 
 #### FireNotes - notes and to-do application.
 
-This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-notes). It is written in React Native and uses [Firebase](https://firebase.google.com/) as a backend.
+This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-notes). It is written in React Native and uses [Firebase](https://firebase.google.com/) as a storage.
 
 ### [See changelog](https://github.com/music-soul1-1/fire-notes-mobile#changelog)
 
@@ -42,6 +42,8 @@ This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-no
 3. Download google-services.json from your Firebase project and put it in the android/app folder.
 4. Run the app with `npm start` in one terminal, and `npx react-native run-android` in the other.
 5. After making changes and testing, open pull request.
+
+To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
 
 To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
 
