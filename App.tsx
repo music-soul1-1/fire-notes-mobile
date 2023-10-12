@@ -39,7 +39,7 @@ function App(): JSX.Element {
     });
   
     async function login() {
-      if (await loadUid()) {
+      if (loadUid()) {
         await onGoogleButtonPress();
       }
     };
@@ -62,9 +62,9 @@ function App(): JSX.Element {
       const { idToken } = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const user = await auth().signInWithCredential(googleCredential);
+      await setUid(user.user.uid);
 
       setUser(user);
-      setUid(user.user.uid);
     }
     catch (error: any) {
       console.error('Google Sign-In Error', error.code);
@@ -87,7 +87,7 @@ function App(): JSX.Element {
 
   if (initializing) return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} >
-      <ActivityIndicator size={60} color={theme.coreColors.tertiary} />
+      <ActivityIndicator size={60} color={consts.textTernaryLight} />
     </View>
   );
 

@@ -45,7 +45,8 @@ This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-no
 
 To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
 
-To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
+Note: if you're experiencing issues with building the app (Could not open proj generic class cache for build file '...\android\app\build.gradle'), 
+try building the app with Android Studio first.
 
 ## Changelog
 ### v.0.0.2

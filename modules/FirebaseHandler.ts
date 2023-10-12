@@ -6,12 +6,13 @@ import { firebase } from "@react-native-firebase/auth";
 
 
 let uid : string | null;
+loadUid(); // Initializing uid value
 
 /**
  * Updates uid value for API handler.
  */
-export async function loadUid() {
-  uid = await EncryptedStorage.getItem("uid") ?? firebase.auth().currentUser?.uid ?? null;
+export function loadUid() {
+  uid = firebase.auth().currentUser?.uid ?? null;
 
   if (uid) {
     return true;
@@ -32,8 +33,6 @@ export async function setUid(uid: string) {
  * @param content Note content text
  */
 export async function addNote(title: string, content: string) {
-  const uid = await EncryptedStorage.getItem("uid") ?? ' ';
-
   if (uid) {
     const noteRef = await firestore()
       .collection("users")
@@ -58,77 +57,73 @@ export async function addNote(title: string, content: string) {
  * @returns array of notes
  */
 export async function getAllNotes() {
-  if (!uid) {
-    uid = '';
-    await loadUid();
+  try {
+    const notesRef = firestore()
+      .collection("users")
+      .doc(uid ?? 'guest')
+      .collection("notes");
+
+    const notesQuery = notesRef.orderBy("updatedAt", "desc");
+    const querySnapshot = await notesQuery.get({ source: 'server' });
+
+    const notes = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      const noteData = {
+        id: doc.id,
+        title: data.title,
+        content: data.content,
+        tags: data.tags ?? [],
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        isPinned: data.isPinned
+      };
+      return noteData;
+    });
+
+    return notes;
   }
-
-  const notesRef = firestore()
-    .collection("users")
-    .doc(uid)
-    .collection("notes");
-
-  const notesQuery = notesRef.orderBy("updatedAt", "desc");
-  const querySnapshot = await notesQuery.get({ source: 'server' });
-
-  const notes = querySnapshot.docs.map((doc) => {
-    const data = doc.data();
-
-    const noteData = {
-      id: doc.id,
-      title: data.title,
-      content: data.content,
-      tags: data.tags ?? [],
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      isPinned: data.isPinned
-    };
-    return noteData;
-  });
-
-  return notes;
+  catch (error) {
+    console.error(error);
+  }
 };
 
 export async function getAllTodos() {
-  if (!uid) {
-    uid = '';
-    await loadUid();
+  try {
+    const todosRef = firestore()
+      .collection("users")
+      .doc(uid ?? 'guest')
+      .collection("todos");
+
+    const notesQuery = todosRef.orderBy("updatedAt", "desc");
+    const querySnapshot = await notesQuery.get();
+
+    const todos = querySnapshot.docs.map((doc) => {
+      const data = doc.data() as Todo;
+
+      const todoData: Todo = {
+        id: doc.id,
+        title: data.title,
+        subtask: data.subtask,
+        tags: data.tags ?? [],
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        isPinned: data.isPinned,
+      };
+      return todoData;
+    });
+
+    return todos;
   }
-
-  const todosRef = firestore()
-    .collection("users")
-    .doc(uid)
-    .collection("todos");
-
-  const notesQuery = todosRef.orderBy("updatedAt", "desc");
-  const querySnapshot = await notesQuery.get();
-
-  const todos = querySnapshot.docs.map((doc) => {
-    const data = doc.data() as Todo;
-
-    const todoData: Todo = {
-      id: doc.id,
-      title: data.title,
-      subtask: data.subtask,
-      tags: data.tags ?? [],
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      isPinned: data.isPinned,
-    };
-    return todoData;
-  });
-
-  return todos;
+  catch (error) {
+    console.error(error);
+  }
 };
 
 export async function addTodo(title: string, subtask: string) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-  
   const todoRef = await firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("todos")
     .add({
       title: title,
@@ -148,12 +143,10 @@ export async function addTodo(title: string, subtask: string) {
     return todoRef.id;
 };
 
-export async function deleteDocument(id: string, type: 'todo' | 'note') {
-  const uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  
+export async function deleteDocument(id: string, type: 'todo' | 'note') {  
   const docRef  = firestore()
       .collection("users")
-      .doc(uid)
+      .doc(uid ?? 'guest')
       .collection(type === "note" ? "notes" : "todos")
       .doc(id);
 
@@ -231,14 +224,10 @@ export function convertTimestampToString(timestamp : FirebaseFirestoreTypes.Time
 
 
 export async function updateNote(note: Note) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("notes")
     .doc(note.id);
 
@@ -258,14 +247,10 @@ export async function updateNote(note: Note) {
 };
 
 export async function updateTodo(todo: Todo) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("todos")
     .doc(todo.id);
 
@@ -287,14 +272,10 @@ export async function updateTodo(todo: Todo) {
 };
 
 export async function updateDate(item: Note | Todo) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection('content' in item ? "notes" : "todos")
     .doc(item.id);
 
@@ -308,14 +289,10 @@ export async function updateDate(item: Note | Todo) {
 };
 
 export async function updateNoteDate(noteId: string | number) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("notes")
     .doc(noteId.toString());
 
@@ -329,14 +306,10 @@ export async function updateNoteDate(noteId: string | number) {
 };
 
 export async function updateCompletedDate(todo: Todo, index: number) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("todos")
     .doc(todo.id);
 
@@ -354,14 +327,10 @@ export async function updateCompletedDate(todo: Todo, index: number) {
 };
 
 export async function updateSubtaskDate(todo: Todo, index: number) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("todos")
     .doc(todo.id);
 
@@ -387,14 +356,10 @@ export async function updateSubtaskDate(todo: Todo, index: number) {
 
 
 export async function getNoteById(id: string | number) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("notes")
     .doc(id.toString());
 
@@ -418,14 +383,10 @@ export async function getNoteById(id: string | number) {
 };
 
 export async function getTodoById(id: string | number) {
-  if (!uid) {
-    uid = await EncryptedStorage.getItem("uid") ?? ' ';
-  }
-
   try {
     const docRef = firestore()
     .collection("users")
-    .doc(uid)
+    .doc(uid ?? 'guest')
     .collection("todos")
     .doc(id.toString());
 
