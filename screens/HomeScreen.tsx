@@ -27,11 +27,15 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
 
   async function fetchData() {
     const fetchedNotes = await getAllNotes();
-    setTimeout(() => {}, 50);
     const fetchedTodos = await getAllTodos();
-    setNotes(fetchedNotes);
-    setTodos(fetchedTodos);
-    setTimeout(() => {}, 50);
+
+    if (fetchedNotes) {
+      setNotes(fetchedNotes);
+    }
+    
+    if (fetchedTodos) {
+      setTodos(fetchedTodos);
+    }
   };
 
   useFocusEffect(
@@ -101,7 +105,7 @@ export default function NoteScreen({ user, setNote, setTodo }: { user: FirebaseA
 
   if (loading) return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} >
-      <ActivityIndicator size={60} color={theme.coreColors.tertiary} />
+      <ActivityIndicator size={60} color={consts.textTernaryLight} />
     </View>
   );
 

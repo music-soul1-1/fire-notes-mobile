@@ -17,6 +17,10 @@ This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-no
 
 ## Screenshots
 
+![Screenshot_2023-10-13-15-18-00-182_com firenotes](https://github.com/music-soul1-1/fire-notes-mobile/assets/72669184/42f7b510-a6c8-4070-a91d-2553b0f9a856)
+![Screenshot_2023-10-13-15-14-25-651_com firenotes](https://github.com/music-soul1-1/fire-notes-mobile/assets/72669184/a1e5bcff-3b74-4679-914e-55b3a1a1a618)
+![Screenshot_2023-10-13-15-14-22-077_com firenotes](https://github.com/music-soul1-1/fire-notes-mobile/assets/72669184/bcb4ec66-8ee8-4f26-86d5-d0dbff23fb7d)
+![Screenshot_2023-10-13-15-13-36-989_com firenotes](https://github.com/music-soul1-1/fire-notes-mobile/assets/72669184/57fc9876-6941-46c1-a162-e756d730ce34)
 
 
 ## Usage
@@ -43,9 +47,10 @@ This is a mobile version of [FireNotes](https://github.com/music-soul1-1/fire-no
 4. Run the app with `npm start` in one terminal, and `npx react-native run-android` in the other.
 5. After making changes and testing, open pull request.
 
-To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
+To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`. Don't forget to change app version (and increment versionCode) in `android/app/build.gradle`.
 
-To build release version, run `cd android` in the project directory. Then run `./gradlew assembleRelease`. The apk will be in `android/app/build/outputs/apk/release/app-release.apk`.
+Note: if you're experiencing issues with building the app (Could not open proj generic class cache for build file '...\android\app\build.gradle'), 
+try building the app with Android Studio first.
 
 ## Changelog
 ### v.0.0.2
